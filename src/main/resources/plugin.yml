@@ -1,0 +1,4 @@
+name: Group-System
+version: '${project.version}'
+main: net.playlegend.spigot.groupsystem.GroupSystemPlugin
+api-version: 1.19
