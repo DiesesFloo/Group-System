@@ -14,7 +14,7 @@ public class MySQLDatabase extends Database {
     @Getter
     private Connection connection;
 
-    public MySQLDatabase(String host, String port, String user, String password, String database) {
+    public MySQLDatabase(String host, int port, String user, String password, String database) {
         super(host, port, user, password, database);
 
         this.service = new MySQLService(this);
@@ -29,6 +29,11 @@ public class MySQLDatabase extends Database {
                     user,
                     password
             );
+
+            boolean dbExists = connection != null;
+
+            Bukkit.getLogger().info(connection.toString());
+
             Bukkit.getLogger().info("[Groups] Connected to database");
         } catch (SQLException e) {
             Bukkit.getLogger().warning("[Groups] Error while connecting to MySQL database:" + e.getMessage());

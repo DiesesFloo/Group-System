@@ -8,19 +8,16 @@ import net.playlegend.spigot.groupsystem.database.groups.GroupGeneric;
 import net.playlegend.spigot.groupsystem.database.groups.UserGeneric;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
 import net.playlegend.spigot.groupsystem.permission.Permission;
-import net.playlegend.spigot.groupsystem.permission.PermissionType;
 import org.bukkit.Bukkit;
 
-import java.lang.reflect.Type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.*;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MySQLService extends DatabaseService {
@@ -38,7 +35,7 @@ public class MySQLService extends DatabaseService {
     @Override
     public void createGroupsTable() {
         CompletableFuture<Void> future = CompletableFuture.runAsync(
-                () -> database.update("CREATE TABLE IF NOT EXISTS group_groups (key VARCHAR(36), priority INT(1000) display_name VARCHAR(50), prefix VARCHAR(50), permissions TEXT)"),
+                () -> database.update("CREATE TABLE IF NOT EXISTS group_groups (group_key VARCHAR(36) PRIMARY KEY UNIQUE, priority INT, display_name VARCHAR(50), prefix VARCHAR(50), permissions TEXT)"),
                 pool
         );
 
@@ -81,32 +78,65 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
-    public UserGeneric getUser(UUID uuid) {
-        try {
-            PreparedStatement st = database.getConnection().prepareStatement("SELECT groups FROM group_users WHERE uuid = ?");
-            st.setString(1, uuid.toString());
+    public CompletableFuture<Boolean> userExists(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement st = database.getConnection().prepareStatement("SELECT uuid FROM group_users WHERE uuid = ?");
+                st.setString(1, uuid.toString());
 
-            CompletableFuture<ResultSet> future = CompletableFuture.supplyAsync(
-                    () -> database.query(st),
-                    pool
-            );
+                CompletableFuture<ResultSet> future = CompletableFuture.supplyAsync(
+                        () -> database.query(st),
+                        pool
+                );
 
-            ResultSet rs = future.get();
+                ResultSet rs = future.get();
 
-            while (rs.next()) {
-                String groupsString = rs.getString("groups");
-                Set<String> groupKeys = gson.fromJson(groupsString, new TypeToken<Set<String>>() {}.getType());
-                Set<GroupGeneric> groups = groupKeys.parallelStream()
-                        .map(this::getGroup)
-                        .collect(Collectors.toSet());
+                return rs.next();
 
-                return new UserGeneric(uuid, groups);
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[Groups] Error while preparing user existing check statement");
             }
-        } catch (Exception e) {
-            Bukkit.getLogger().warning("[Groups] Error while preparing user getting statement");
-        }
 
-        return null;
+            return false;
+        }, pool);
+    }
+
+    @Override
+    public CompletableFuture<Optional<UserGeneric>> getUser(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement st = database.getConnection().prepareStatement("SELECT groups FROM group_users WHERE uuid = ?");
+                st.setString(1, uuid.toString());
+
+                CompletableFuture<ResultSet> future = CompletableFuture.supplyAsync(
+                        () -> database.query(st),
+                        pool
+                );
+
+                ResultSet rs = future.get();
+
+                if (!rs.next()) {
+                    return Optional.empty();
+                }
+
+                String groupsString = rs.getString("groups");
+
+                rs.close();
+
+                Set<String> groupKeys = gson.fromJson(groupsString, Set.class);
+
+                Set<GroupGeneric> groups = ConcurrentHashMap.newKeySet();
+                groupKeys.forEach(groupKey -> getGroup(groupKey).thenAccept(optionalGroup -> optionalGroup.ifPresent(groups::add)));
+
+
+                return Optional.of(new UserGeneric(uuid, groups));
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[Groups] Error while preparing user getting statement");
+            }
+
+            return Optional.empty();
+
+        }, pool);
     }
 
     @Override
@@ -141,33 +171,64 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
-    public GroupGeneric getGroup(String key) {
-        key = key.toLowerCase();
+    public CompletableFuture<Boolean> groupExists(String key) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement st = database.getConnection().prepareStatement("SELECT group_key FROM group_groups WHERE group_key=?");
+                st.setString(1, key);
 
-        try {
-            PreparedStatement st = database.getConnection().prepareStatement("SELECT * FROM group_groups WHERE key = ?");
-            st.setString(1, key);
+                CompletableFuture<ResultSet> future = CompletableFuture.supplyAsync(
+                        () -> database.query(st),
+                        pool
+                );
 
-            ResultSet rs = database.query(st);
-            while (rs.next()) {
+                ResultSet rs = future.get();
+
+                return rs.next();
+
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[Groups] Error while preparing group existing check statement");
+            }
+
+            return false;
+        }, pool);
+    }
+
+    @Override
+    public CompletableFuture<Optional<GroupGeneric>> getGroup(String key) {
+        return CompletableFuture.supplyAsync(() -> {
+            key.toLowerCase();
+            try {
+                PreparedStatement st = database.getConnection().prepareStatement("SELECT * FROM group_groups WHERE group_key = ?");
+                st.setString(1, key);
+
+                ResultSet rs = database.query(st);
+
+                if (!rs.next()) {
+                    return Optional.empty();
+                }
+
                 int priority = rs.getInt("priority");
                 String displayName = rs.getString("display_name");
                 String prefix = rs.getString("prefix");
                 Set<Permission> permissions = getPermissionsFromJson(rs.getString("permissions"));
 
-                return new GroupGeneric(key, priority, displayName, prefix, permissions);
+                rs.close();
 
+                return Optional.of(new GroupGeneric(key, priority, displayName, prefix, permissions));
 
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[Groups] Error while preparing group getting statement");
             }
-        } catch (SQLException e) {
-            Bukkit.getLogger().warning("[Groups] Error while preparing group getting statement");
-        }
 
-        return null;
+            return Optional.empty();
+
+        }, pool);
     }
 
-    private Set<Permission> getPermissionsFromJson(String jsonString)  {
-        return gson.fromJson(jsonString, new TypeToken<Set<Permission>>() {}.getType());
+    private Set<Permission> getPermissionsFromJson(String jsonString) {
+        return gson.fromJson(jsonString, new TypeToken<Set<Permission>>() {
+        }.getType());
     }
 }
 

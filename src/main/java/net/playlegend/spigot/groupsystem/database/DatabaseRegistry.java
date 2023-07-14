@@ -7,10 +7,10 @@ import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.database.util.Database;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
-@Setter
 public class DatabaseRegistry {
 
+    @Getter
+    @Setter
     static Database database;
 
 }

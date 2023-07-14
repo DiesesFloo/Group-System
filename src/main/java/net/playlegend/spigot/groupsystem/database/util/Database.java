@@ -2,9 +2,10 @@ package net.playlegend.spigot.groupsystem.database.util;
 
 public abstract class Database {
 
-    protected final String host, port, user, password, database;
+    protected final String host, user, password, database;
+    protected final int port;
 
-    public Database(String host, String port, String user, String password, String database) {
+    public Database(String host, int port, String user, String password, String database) {
         this.host = host;
         this.port = port;
         this.user = user;
