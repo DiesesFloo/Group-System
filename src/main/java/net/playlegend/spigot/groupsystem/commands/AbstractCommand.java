@@ -19,7 +19,9 @@ public abstract class AbstractCommand extends Command {
         try {
             return onExecute(sender, s, strings);
         } catch (NotEnoughArgumentsException e) {
-            sender.sendMessage(new Message("general.not-enough-arguments").get());
+            Message msg = new Message("general.not-enough-arguments");
+            msg.setMessage(e.getMessage());
+            sender.sendMessage(msg.get());
         } catch (NoPermissionException e) {
             sender.sendMessage(new Message("general.no-perm", e.getPermission()).get());
         } catch (PlayerNotFoundException e) {
