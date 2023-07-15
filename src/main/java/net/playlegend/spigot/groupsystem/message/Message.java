@@ -1,23 +1,28 @@
 package net.playlegend.spigot.groupsystem.message;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.GroupSystemPlugin;
 import net.playlegend.spigot.groupsystem.groups.GroupGeneric;
 import net.playlegend.spigot.groupsystem.groups.UserGeneric;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.sql.Timestamp;
 import java.util.Optional;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Setter
 public class Message {
 
-    private static YamlConfiguration configuration;
+    static YamlConfiguration configuration;
 
-    private String key;
-    private UserGeneric user;
-    private GroupGeneric group;
-    private String username;
-    private String message;
+    final String key;
+    UserGeneric user;
+    GroupGeneric group;
+    String username;
+    String message;
+    String permission;
 
     public Message(String key) {
         this.key = key;
@@ -39,6 +44,11 @@ public class Message {
     public Message(String key, GroupGeneric group) {
         this.key = key;
         this.group = group;
+    }
+
+    public Message(String key, String permission) {
+        this.key = key;
+        this.permission = permission;
     }
 
     public String get() {
@@ -68,6 +78,10 @@ public class Message {
             message = message.replace("%group_color%", "§" + group.getColor());
             message = message.replace("%group_prefix%", group.getPrefix());
             message = message.replace("%group_name%", group.getDisplayName());
+        }
+
+        if (permission != null) {
+            message = message.replace("%permission%", permission);
         }
 
         message = ChatColor.translateAlternateColorCodes('&', message);
