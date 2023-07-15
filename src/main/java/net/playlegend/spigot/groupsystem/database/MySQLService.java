@@ -258,8 +258,7 @@ public class MySQLService extends DatabaseService {
     }
 
     private Set<Permission> getPermissionsFromJson(String jsonString) {
-        return gson.fromJson(jsonString, new TypeToken<Set<Permission>>() {
-        }.getType());
+        return gson.fromJson(jsonString, Set.class);
     }
 }
 
