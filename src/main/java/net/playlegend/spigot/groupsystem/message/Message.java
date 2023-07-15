@@ -41,17 +41,18 @@ public class Message {
         }
 
         if (user != null) {
-            Timestamp timestamp = user.getGroupUntilTimeStamp();
 
-            if (timestamp == null) {
+            GroupGeneric userGroup = user.getGroup();
+
+            if (user.groupIsPermanent()) {
                 message = message.replace("%user_group_until%", "PERMANENT");
             } else {
                 message = message.replace("%user_group_until%", user.getGroupUntilTimeStamp().toString());
             }
 
             message = message.replace("%user_group_color%", "§" + user.getGroup().getColor());
-            message = message.replace("%user_group_prefix%", user.getGroup().getPrefix());
-            message = message.replace("%user_group_name%", user.getGroup().getDisplayName());
+            message = message.replace("%user_group_prefix%", userGroup.getPrefix());
+            message = message.replace("%user_group_name%", userGroup.getDisplayName());
             message = message.replace("%username%", username);
         }
 
