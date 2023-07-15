@@ -3,10 +3,13 @@ package net.playlegend.spigot.groupsystem.commands;
 import net.playlegend.spigot.groupsystem.commands.exceptions.NoPermissionException;
 import net.playlegend.spigot.groupsystem.commands.exceptions.NotEnoughArgumentsException;
 import net.playlegend.spigot.groupsystem.commands.exceptions.PlayerNotFoundException;
+import net.playlegend.spigot.groupsystem.commands.exceptions.ServerException;
 import net.playlegend.spigot.groupsystem.message.Message;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import java.nio.Buffer;
 import java.util.List;
 
 public abstract class AbstractCommand extends Command {
@@ -28,11 +31,14 @@ public abstract class AbstractCommand extends Command {
             Message msg = new Message("general.player-not-found");
             msg.setUsername(e.getInput());
             sender.sendMessage(msg.get());
+        } catch (ServerException e) {
+            sender.sendMessage(new Message("general.server-exception").get());
+            Bukkit.getLogger().warning("[Groups] Error while performing /" + getName() + " (performed by " + sender.getName() + e.getMessage());
         }
 
         return false;
     }
 
     public abstract boolean onExecute(CommandSender sender, String cmd, String[] args)
-            throws NotEnoughArgumentsException, NoPermissionException, PlayerNotFoundException;
+            throws NotEnoughArgumentsException, NoPermissionException, PlayerNotFoundException, ServerException;
     }
