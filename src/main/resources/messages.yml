@@ -1,5 +1,9 @@
 prefix: "&8[&cGroups§8] &7"
+general:
+  no-perm: "&7You are &clacking &7the permission &8'&7&o%permission%&8&r'"
+  player-not-found: "&7This player &cwasn't &7found."
+  not-enough-arguments: "&7Wrong command usage. Please provide more arguments."
 commands:
   creategroup:
-    created: &7The group %group_color%%group_name% &7was created &asuccessfully&7.
-    exists: &7This group already &cexists&7.
+    created: "&7The group %group_color%%group_name% &7was created &asuccessfully&7."
+    exists: "&7This group already &cexists&7."
