@@ -17,6 +17,7 @@ public class Message {
     private UserGeneric user;
     private GroupGeneric group;
     private String username;
+    private String message;
 
     public Message(String key) {
         this.key = key;
@@ -27,6 +28,13 @@ public class Message {
         this.user = user;
         this.username = username;
     }
+    public Message(String key, UserGeneric user, String username, String message) {
+        this.key = key;
+        this.user = user;
+        this.username = username;
+        this.message = message;
+    }
+
 
     public Message(String key, GroupGeneric group) {
         this.key = key;
@@ -63,6 +71,10 @@ public class Message {
         }
 
         message = ChatColor.translateAlternateColorCodes('&', message);
+
+        if (message != null) {
+            message = message.replace("%message%", message);
+        }
 
         return Optional.of(message);
     }
