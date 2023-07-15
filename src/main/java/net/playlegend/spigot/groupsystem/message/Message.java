@@ -28,6 +28,7 @@ public class Message {
         this.user = user;
         this.username = username;
     }
+
     public Message(String key, UserGeneric user, String username, String message) {
         this.key = key;
         this.user = user;
@@ -35,17 +36,16 @@ public class Message {
         this.message = message;
     }
 
-
     public Message(String key, GroupGeneric group) {
         this.key = key;
         this.group = group;
     }
 
-    public Optional<String> get() {
+    public String get() {
         String message = configuration.getString(this.key);
 
         if (message == null) {
-            return Optional.empty();
+            return "Message is missing, please contact the PlayLegend-team (Key:" + key + ")";
         }
 
         if (user != null) {
@@ -72,11 +72,11 @@ public class Message {
 
         message = ChatColor.translateAlternateColorCodes('&', message);
 
-        if (message != null) {
+        if (this.message != null) {
             message = message.replace("%message%", message);
         }
 
-        return Optional.of(message);
+        return message;
     }
 
     public static void reloadConfig() {
