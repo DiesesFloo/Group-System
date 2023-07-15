@@ -71,6 +71,9 @@ public class Message {
             message = message.replace("%user_group_color%", "§" + user.getGroup().getColor());
             message = message.replace("%user_group_prefix%", userGroup.getPrefix());
             message = message.replace("%user_group_name%", userGroup.getDisplayName());
+        }
+
+        if (username != null) {
             message = message.replace("%username%", username);
         }
 
