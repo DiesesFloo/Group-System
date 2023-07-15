@@ -1,4 +1,4 @@
-package net.playlegend.spigot.groupsystem.database.groups;
+package net.playlegend.spigot.groupsystem.groups;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.permission.Permission;
 
-import java.util.List;
 import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -23,5 +22,7 @@ public class GroupGeneric {
     final String prefix;
 
     final Set<Permission> permissions;
+
+    final char color;
 
 }

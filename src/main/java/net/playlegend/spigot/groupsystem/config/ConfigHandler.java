@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.GroupSystemPlugin;
 import net.playlegend.spigot.groupsystem.database.DatabaseRegistry;
 import net.playlegend.spigot.groupsystem.database.MySQLDatabase;
+import net.playlegend.spigot.groupsystem.message.Message;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -54,6 +55,8 @@ public class ConfigHandler {
         String password = mySQLConfig.getString("password");
 
         DatabaseRegistry.setDatabase(new MySQLDatabase(host, port, username, password, database));
+
+        Message.reloadConfig();
     }
 
     public CompletableFuture<Optional<YamlConfiguration>> getMessagesConfig() {

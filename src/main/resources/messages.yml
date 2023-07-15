@@ -1,0 +1,5 @@
+prefix: "&8[&cGroups§8] &7"
+commands:
+  creategroup:
+    created: &7The group %group_color%%group_name% &7was created &asuccessfully&7.
+    exists: &7This group already &cexists&7.

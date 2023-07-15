@@ -4,19 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import net.playlegend.spigot.groupsystem.database.groups.GroupGeneric;
-import net.playlegend.spigot.groupsystem.database.groups.UserGeneric;
+import net.playlegend.spigot.groupsystem.groups.GroupGeneric;
+import net.playlegend.spigot.groupsystem.groups.UserGeneric;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
 import net.playlegend.spigot.groupsystem.permission.Permission;
 import org.bukkit.Bukkit;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.sql.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -35,7 +30,7 @@ public class MySQLService extends DatabaseService {
     @Override
     public void createGroupsTable() {
         CompletableFuture<Void> future = CompletableFuture.runAsync(
-                () -> database.update("CREATE TABLE IF NOT EXISTS group_groups (group_key VARCHAR(36) PRIMARY KEY UNIQUE, priority INT, display_name VARCHAR(50), prefix VARCHAR(50), permissions TEXT)"),
+                () -> database.update("CREATE TABLE IF NOT EXISTS group_groups (group_key VARCHAR(36) PRIMARY KEY UNIQUE, priority INT, display_name VARCHAR(50), prefix VARCHAR(50), color VARCHAR(1), permissions TEXT)"),
                 pool
         );
 
@@ -45,7 +40,7 @@ public class MySQLService extends DatabaseService {
     @Override
     public void createUsersTable() {
         CompletableFuture<Void> future = CompletableFuture.runAsync(
-                () -> database.update("CREATE TABLE IF NOT EXISTS group_users (uuid VARCHAR(36) PRIMARY KEY UNIQUE, groups TEXT)"),
+                () -> database.update("CREATE TABLE IF NOT EXISTS group_users (uuid VARCHAR(36) PRIMARY KEY UNIQUE, group_name VARCHAR(36) DEFAULT 'default', until TIMESTAMP NULL)"),
                 pool
         );
 
@@ -53,18 +48,40 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
-    public void createUser(UserGeneric user) {
-        List<String> groupKeys = user.getGroups().parallelStream()
-                .map(GroupGeneric::getKey)
-                .toList();
+    public void createDefaultGroup() {
+        try {
+            if (groupExists("default").get()) {
+                return;
+            }
 
-        String groups = gson.toJson(groupKeys);
+            GroupGeneric defaultGroup = new GroupGeneric(
+                    "default",
+                    100,
+                    "Default",
+                    "&7",
+                    Collections.emptySet(),
+                    '7'
+            );
+
+            createGroup(defaultGroup);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void createUser(UserGeneric user) {
+        String group = user.getGroup().getKey();
+        Timestamp timestamp = user.getGroupUntilTimeStamp();
 
         try {
-            PreparedStatement st = database.getConnection().prepareStatement("INSERT INTO group_users (uuid, groups) VALUES (?,?) ON DUPLICATE KEY UPDATE groups = ?");
+            PreparedStatement st = database.getConnection().prepareStatement("INSERT INTO group_users (uuid, group_name, until) VALUES (?,?,?) ON DUPLICATE KEY UPDATE group_name = ?, until = ?");
+
             st.setString(1, user.getUuid().toString());
-            st.setString(2, groups);
-            st.setString(3, groups);
+            st.setString(2, group);
+            st.setTimestamp(3, timestamp);
+            st.setString(4, group);
+            st.setTimestamp(5, timestamp);
 
             CompletableFuture<Void> future = CompletableFuture.runAsync(
                     () -> database.update(st),
@@ -73,7 +90,7 @@ public class MySQLService extends DatabaseService {
 
             future.join();
         } catch (SQLException e) {
-            Bukkit.getLogger().warning("[Groups] Error while preparing user creation statement");
+            Bukkit.getLogger().warning("[Groups] Error while creating user: " + e.getMessage());
         }
     }
 
@@ -94,7 +111,7 @@ public class MySQLService extends DatabaseService {
                 return rs.next();
 
             } catch (Exception e) {
-                Bukkit.getLogger().warning("[Groups] Error while preparing user existing check statement");
+                Bukkit.getLogger().warning("[Groups] Error while checking user existing: " + e.getMessage());
             }
 
             return false;
@@ -105,7 +122,7 @@ public class MySQLService extends DatabaseService {
     public CompletableFuture<Optional<UserGeneric>> getUser(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                PreparedStatement st = database.getConnection().prepareStatement("SELECT groups FROM group_users WHERE uuid = ?");
+                PreparedStatement st = database.getConnection().prepareStatement("SELECT group, until FROM group_users WHERE uuid = ?");
                 st.setString(1, uuid.toString());
 
                 CompletableFuture<ResultSet> future = CompletableFuture.supplyAsync(
@@ -119,19 +136,24 @@ public class MySQLService extends DatabaseService {
                     return Optional.empty();
                 }
 
-                String groupsString = rs.getString("groups");
+                String groupString = rs.getString("group");
+                Timestamp until = rs.getTimestamp("until");
 
                 rs.close();
 
-                Set<String> groupKeys = gson.fromJson(groupsString, Set.class);
+                GroupGeneric group = getGroup("default").get().get();
 
-                Set<GroupGeneric> groups = ConcurrentHashMap.newKeySet();
-                groupKeys.forEach(groupKey -> getGroup(groupKey).thenAccept(optionalGroup -> optionalGroup.ifPresent(groups::add)));
+                if (!groupString.equals("default")) {
+                    Optional<GroupGeneric> groupOptional = getGroup(groupString).get();
 
+                    if (groupOptional.isPresent()) {
+                        group = groupOptional.get();
+                    }
+                }
 
-                return Optional.of(new UserGeneric(uuid, groups));
+                return Optional.of(new UserGeneric(uuid, group, until));
             } catch (Exception e) {
-                Bukkit.getLogger().warning("[Groups] Error while preparing user getting statement");
+                Bukkit.getLogger().warning("[Groups] Error while getting user: " + e.getMessage());
             }
 
             return Optional.empty();
@@ -143,21 +165,29 @@ public class MySQLService extends DatabaseService {
     public void createGroup(GroupGeneric group) {
         try {
             PreparedStatement st = database.getConnection()
-                    .prepareStatement("INSERT INTO group_groups (key, priority, display_name, prefix, permissions) " +
-                            "VALUES(?,?,?,?,?) ON DUPLICATE KEY " +
-                            "UPDATE priority=?, display_name=?, prefix=?, permissions=?");
+                    .prepareStatement("INSERT INTO group_groups (group_key, priority, display_name, prefix, color, permissions) " +
+                            "VALUES(?,?,?,?,?,?) ON DUPLICATE KEY " +
+                            "UPDATE priority=?, display_name=?, prefix=?, color=?, permissions=?");
 
-            String permissions = gson.toJson(group.getPermissions());
+            String permissions;
+
+            if (group.getPermissions().isEmpty()) {
+                permissions = "[]";
+            } else {
+                permissions = gson.toJson(group.getPermissions());
+            }
 
             st.setString(1, group.getKey());
             st.setInt(2, group.getPriority());
             st.setString(3, group.getDisplayName());
             st.setString(4, group.getPrefix());
-            st.setString(5, permissions);
-            st.setInt(6, group.getPriority());
-            st.setString(7, group.getDisplayName());
-            st.setString(8, group.getPrefix());
-            st.setString(9, permissions);
+            st.setString(5, String.valueOf(group.getColor()));
+            st.setString(6, permissions);
+            st.setInt(7, group.getPriority());
+            st.setString(8, group.getDisplayName());
+            st.setString(9, group.getPrefix());
+            st.setString(10, String.valueOf(group.getColor()));
+            st.setString(11, permissions);
 
             CompletableFuture<Void> future = CompletableFuture.runAsync(
                     () -> database.update(st),
@@ -166,7 +196,7 @@ public class MySQLService extends DatabaseService {
 
             future.join();
         } catch (SQLException e) {
-            Bukkit.getLogger().warning("[Groups] Error while preparing group creation statement");
+            Bukkit.getLogger().warning("[Groups] Error while creating group: " + e.getMessage());
         }
     }
 
@@ -187,7 +217,7 @@ public class MySQLService extends DatabaseService {
                 return rs.next();
 
             } catch (Exception e) {
-                Bukkit.getLogger().warning("[Groups] Error while preparing group existing check statement");
+                Bukkit.getLogger().warning("[Groups] Error while checking user existing: " + e.getMessage());
             }
 
             return false;
@@ -211,14 +241,15 @@ public class MySQLService extends DatabaseService {
                 int priority = rs.getInt("priority");
                 String displayName = rs.getString("display_name");
                 String prefix = rs.getString("prefix");
+                String colorString = rs.getString("color");
                 Set<Permission> permissions = getPermissionsFromJson(rs.getString("permissions"));
 
                 rs.close();
 
-                return Optional.of(new GroupGeneric(key, priority, displayName, prefix, permissions));
+                return Optional.of(new GroupGeneric(key, priority, displayName, prefix, permissions, colorString.charAt(0)));
 
             } catch (Exception e) {
-                Bukkit.getLogger().warning("[Groups] Error while preparing group getting statement");
+                Bukkit.getLogger().warning("[Groups] Error while getting group: " + e.getMessage());
             }
 
             return Optional.empty();
