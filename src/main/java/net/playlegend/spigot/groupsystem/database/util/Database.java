@@ -1,9 +1,13 @@
 package net.playlegend.spigot.groupsystem.database.util;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PROTECTED)
 public abstract class Database {
 
-    protected final String host, user, password, database;
-    protected final int port;
+    final String host, user, password, database;
+    final int port;
 
     public Database(String host, int port, String user, String password, String database) {
         this.host = host;

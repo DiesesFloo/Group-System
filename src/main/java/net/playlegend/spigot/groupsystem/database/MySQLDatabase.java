@@ -1,18 +1,21 @@
 package net.playlegend.spigot.groupsystem.database;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.database.util.Database;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MySQLDatabase extends Database {
 
-    private DatabaseService service;
+    DatabaseService service;
 
     @Getter
-    private Connection connection;
+    Connection connection;
 
     public MySQLDatabase(String host, int port, String user, String password, String database) {
         super(host, port, user, password, database);
