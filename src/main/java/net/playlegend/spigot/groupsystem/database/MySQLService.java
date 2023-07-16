@@ -201,6 +201,32 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
+    public void deleteGroup(String key) {
+        key = key.toLowerCase();
+
+        try {
+            PreparedStatement groupSt = database.getConnection().prepareStatement("DELETE FROM group_groups WHERE group_key = ?");
+            groupSt.setString(1, key);
+
+            PreparedStatement userSt = database.getConnection().prepareStatement("UPDATE group_users SET group_name = ?, until = NULL WHERE group_name = ?");
+            userSt.setString(1, "default");
+            userSt.setString(2, key);
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(
+                    () -> {
+                        database.update(groupSt);
+                        database.update(userSt);
+                    },
+                    pool
+            );
+
+            future.join();
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("[Groups] Error while deleting group: " + e.getMessage());
+        }
+    }
+
+    @Override
     public CompletableFuture<Boolean> groupExists(String key) {
         return CompletableFuture.supplyAsync(() -> {
             try {

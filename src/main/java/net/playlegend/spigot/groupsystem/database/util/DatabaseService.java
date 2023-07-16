@@ -23,6 +23,8 @@ public abstract class DatabaseService {
 
     public abstract void createGroup(GroupGeneric group);
 
+    public abstract void deleteGroup(String key);
+
     public abstract CompletableFuture<Boolean> groupExists(String key);
 
     public abstract CompletableFuture<Optional<GroupGeneric>> getGroup(String key);
