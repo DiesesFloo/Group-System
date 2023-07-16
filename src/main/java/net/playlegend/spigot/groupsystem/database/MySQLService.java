@@ -40,7 +40,7 @@ public class MySQLService extends DatabaseService {
     @Override
     public void createUsersTable() {
         CompletableFuture<Void> future = CompletableFuture.runAsync(
-                () -> database.update("CREATE TABLE IF NOT EXISTS group_users (uuid VARCHAR(36) PRIMARY KEY UNIQUE, group_name VARCHAR(36) DEFAULT 'default', until TIMESTAMP NULL)"),
+                () -> database.update("CREATE TABLE IF NOT EXISTS group_users (uuid VARCHAR(36) PRIMARY KEY UNIQUE, group_key VARCHAR(36) DEFAULT 'default', until TIMESTAMP NULL)"),
                 pool
         );
 
@@ -75,7 +75,7 @@ public class MySQLService extends DatabaseService {
         Timestamp timestamp = user.getGroupUntilTimeStamp();
 
         try {
-            PreparedStatement st = database.getConnection().prepareStatement("INSERT INTO group_users (uuid, group_name, until) VALUES (?,?,?) ON DUPLICATE KEY UPDATE group_name = ?, until = ?");
+            PreparedStatement st = database.getConnection().prepareStatement("INSERT INTO group_users (uuid, group_key, until) VALUES (?,?,?) ON DUPLICATE KEY UPDATE group_key = ?, until = ?");
 
             st.setString(1, user.getUuid().toString());
             st.setString(2, group);
@@ -122,7 +122,7 @@ public class MySQLService extends DatabaseService {
     public CompletableFuture<Optional<UserGeneric>> getUser(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                PreparedStatement st = database.getConnection().prepareStatement("SELECT group_name, until FROM group_users WHERE uuid = ?");
+                PreparedStatement st = database.getConnection().prepareStatement("SELECT group_key, until FROM group_users WHERE uuid = ?");
                 st.setString(1, uuid.toString());
 
                 CompletableFuture<ResultSet> future = CompletableFuture.supplyAsync(
@@ -136,7 +136,7 @@ public class MySQLService extends DatabaseService {
                     return Optional.empty();
                 }
 
-                String groupString = rs.getString("group_name");
+                String groupString = rs.getString("group_key");
                 Timestamp until = rs.getTimestamp("until");
 
                 rs.close();
