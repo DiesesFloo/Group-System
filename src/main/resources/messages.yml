@@ -14,3 +14,6 @@ commands:
   setgroup:
     time-number: "&7The time must be a &cnumber&7."
     group-set: "&7The group %group_color%%group_name% &7was set to &6%username% &8(&6%days%&8)"
+  getgroup:
+    self: "&7Your group: %user_group_color%%user_group_name% &8(&7%user_group_until%&8)"
+    other: "&6%username%'s &7group: %user_group_color%%user_group_name% &8(&7%user_group_until%&8)"
