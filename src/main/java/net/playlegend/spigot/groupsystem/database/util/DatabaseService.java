@@ -34,6 +34,8 @@ public abstract class DatabaseService {
 
     public abstract void setPrefix(String key, String prefix);
 
+    public abstract void setColor(String key, char color);
+
     public abstract CompletableFuture<Boolean> groupExists(String key);
 
     public abstract CompletableFuture<Optional<GroupGeneric>> getGroup(String key);

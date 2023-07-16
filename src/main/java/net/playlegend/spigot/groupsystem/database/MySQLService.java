@@ -302,6 +302,25 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
+    public void setColor(String key, char color) {
+        try {
+            PreparedStatement st = database.getConnection().prepareStatement("UPDATE group_groups SET color = ? WHERE group_key = ?");
+            st.setString(1, String.valueOf(color));
+            st.setString(2, key);
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(
+                    () -> database.update(st),
+                    pool
+            );
+
+            future.join();
+
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("[Groups] Error while setting prefix: " + e.getMessage());
+        }
+    }
+
+    @Override
     public CompletableFuture<Boolean> groupExists(String key) {
         return CompletableFuture.supplyAsync(() -> {
             try {
