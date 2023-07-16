@@ -162,6 +162,25 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
+    public void setGroup(UUID uuid, String key, Timestamp until) {
+        try {
+            PreparedStatement st = database.getConnection().prepareStatement("UPDATE group_users SET group_key = ?, until = ? WHERE uuid = ?");
+            st.setString(1, key);
+            st.setTimestamp(2, until);
+            st.setString(3, uuid.toString());
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(
+                    () -> database.update(st),
+                    pool
+            );
+
+            future.join();
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("[Groups] Error while setting group: " + e.getMessage());
+        }
+    }
+
+    @Override
     public void createGroup(GroupGeneric group) {
         try {
             PreparedStatement st = database.getConnection()
@@ -223,6 +242,62 @@ public class MySQLService extends DatabaseService {
             future.join();
         } catch (SQLException e) {
             Bukkit.getLogger().warning("[Groups] Error while deleting group: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void setPriority(String key, int priority) {
+        try {
+            PreparedStatement st = database.getConnection().prepareStatement("UPDATE group_groups SET priority = ? WHERE group_key = ?");
+            st.setInt(1, priority);
+            st.setString(2, key);
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(
+                    () -> database.update(st),
+                    pool
+            );
+
+            future.join();
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("[Groups] Error while setting priority: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void setDisplayName(String key, String displayName) {
+        try {
+            PreparedStatement st = database.getConnection().prepareStatement("UPDATE group_groups SET display_name = ? WHERE group_key = ?");
+            st.setString(1, displayName);
+            st.setString(2, key);
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(
+                    () -> database.update(st),
+                    pool
+            );
+
+            future.join();
+
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("[Groups] Error while setting display-name: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void setPrefix(String key, String prefix) {
+        try {
+            PreparedStatement st = database.getConnection().prepareStatement("UPDATE group_groups SET prefix = ? WHERE group_key = ?");
+            st.setString(1, prefix);
+            st.setString(2, key);
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(
+                    () -> database.update(st),
+                    pool
+            );
+
+            future.join();
+
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("[Groups] Error while setting prefix: " + e.getMessage());
         }
     }
 

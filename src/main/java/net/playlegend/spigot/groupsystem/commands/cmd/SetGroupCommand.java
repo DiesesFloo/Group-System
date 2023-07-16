@@ -5,10 +5,8 @@ import net.playlegend.spigot.groupsystem.commands.exceptions.*;
 import net.playlegend.spigot.groupsystem.database.DatabaseRegistry;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
 import net.playlegend.spigot.groupsystem.groups.GroupGeneric;
-import net.playlegend.spigot.groupsystem.groups.UserGeneric;
 import net.playlegend.spigot.groupsystem.message.Message;
 import net.playlegend.spigot.groupsystem.mojang.UUIDFetcher;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.sql.Timestamp;
@@ -89,28 +87,14 @@ public class SetGroupCommand extends AbstractCommand {
             }
         }
 
-        try {
-            Optional<UserGeneric> userOptional = service.getUser(uuid).get();
 
-            if (userOptional.isEmpty()) {
-                throw new PlayerNotFoundException(playerString);
-            }
+        service.setGroup(uuid, groupString, timestamp);
 
-            UserGeneric user = userOptional.get();
+        Message msg = new Message("commands.setgroup.group-set", group);
+        msg.setUsername(playerString);
+        msg.setDays(days);
 
-            user.setGroup(group);
-            user.setGroupUntilTimeStamp(timestamp);
-
-            service.createUser(user);
-
-            Message msg = new Message("commands.setgroup.group-set", user, playerString, days);
-            msg.setGroup(group);
-
-            sender.sendMessage(msg.get());
-
-        } catch (ExecutionException | InterruptedException e) {
-            throw new ServerException("Type: '" + e.getCause() + "'; Message: '" + e.getMessage() + "'");
-        }
+        sender.sendMessage(msg.get());
 
         return true;
     }
