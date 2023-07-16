@@ -24,7 +24,7 @@ public class Message {
     String message;
     String permission;
     String input;
-    Integer days;
+    int days = 0;
 
     public Message(String key) {
         this.key = key;
