@@ -2,10 +2,7 @@ package net.playlegend.spigot.groupsystem.commands;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import net.playlegend.spigot.groupsystem.commands.cmd.CreateGroupCommand;
-import net.playlegend.spigot.groupsystem.commands.cmd.DeleteGroupCommand;
-import net.playlegend.spigot.groupsystem.commands.cmd.GetGroupCommand;
-import net.playlegend.spigot.groupsystem.commands.cmd.SetGroupCommand;
+import net.playlegend.spigot.groupsystem.commands.cmd.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -28,6 +25,10 @@ public class CommandRegistry {
         register(new SetGroupCommand());
         register(new GetGroupCommand());
         register(new DeleteGroupCommand());
+        register(new SetDisplayNameCommand());
+        register(new SetPrefixCommand());
+        register(new SetPriorityCommand());
+        register(new SetColorCommand());
     }
 
     private void register(Command command) {

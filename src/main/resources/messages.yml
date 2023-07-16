@@ -19,3 +19,13 @@ commands:
     other: "&6%username%'s &7group: %user_group_color%%user_group_name% &8(&7%user_group_until%&8)"
   deletegroup:
     deleted: "&7The group &6%input% &7was deleted &asuccessfully&7."
+  setpriority:
+    priority-number: "&7The priority must be a &cnumber&7."
+    set: "&7The priority was set to &6%input% &asuccessfully&7."
+  setdisplayname:
+    set: "&7The displayname was set to &6%input% &asuccessfully&7."
+  setprefix:
+    set: "&7The prefix was set to %input%Player &asuccessfully&7."
+  setcolor:
+    no-color-code: "&c%input% &7isn't a color-code."
+    set: "&7The color was set to %input%▮ &asuccessfully&7."
