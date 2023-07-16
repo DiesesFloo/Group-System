@@ -18,6 +18,10 @@ public abstract class DatabaseService {
 
     public abstract void createUser(UserGeneric user);
 
+    public abstract CompletableFuture<Optional<String>> getPrefix(UUID uuid);
+
+    public abstract CompletableFuture<Optional<Character>> getColor(UUID uuid);
+
     public abstract CompletableFuture<Boolean> userExists(UUID uuid);
 
     public abstract CompletableFuture<Optional<UserGeneric>> getUser(UUID uuid);

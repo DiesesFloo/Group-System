@@ -1,7 +1,6 @@
 package net.playlegend.spigot.groupsystem.database;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.groups.GroupGeneric;
@@ -92,6 +91,90 @@ public class MySQLService extends DatabaseService {
         } catch (SQLException e) {
             Bukkit.getLogger().warning("[Groups] Error while creating user: " + e.getMessage());
         }
+    }
+
+    @Override
+    public CompletableFuture<Optional<String>> getPrefix(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement groupKeySt = database.getConnection().prepareStatement("SELECT group_key FROM group_users WHERE uuid = ?");
+
+                CompletableFuture<ResultSet> groupKeyFuture = CompletableFuture.supplyAsync(
+                        () -> database.query(groupKeySt),
+                        pool
+                );
+
+                ResultSet groupKeyRs = groupKeyFuture.get();
+
+                if (!groupKeyRs.next()) {
+                    return Optional.empty();
+                }
+
+                String groupKey = groupKeyRs.getString("group_key");
+
+                PreparedStatement groupPrefixSt = database.getConnection().prepareStatement("SELECT prefix FROM group_groups WHERE group_key = ?");
+                CompletableFuture<ResultSet> groupPrefixFuture = CompletableFuture.supplyAsync(
+                        () -> database.query(groupPrefixSt),
+                        pool
+                );
+
+                ResultSet groupPrefixRs = groupPrefixFuture.get();
+
+                if (!groupPrefixRs.next()) {
+                    return Optional.empty();
+                }
+
+                String prefix = groupPrefixRs.getString("prefix");
+
+                return Optional.of(prefix);
+
+            } catch (SQLException | InterruptedException | ExecutionException e) {
+                Bukkit.getLogger().warning("[Groups] Error while checking user existing: " + e.getMessage());
+                return Optional.empty();
+            }
+        }, pool);
+    }
+
+    @Override
+    public CompletableFuture<Optional<Character>> getColor(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement groupKeySt = database.getConnection().prepareStatement("SELECT group_key FROM group_users WHERE uuid = ?");
+
+                CompletableFuture<ResultSet> groupKeyFuture = CompletableFuture.supplyAsync(
+                        () -> database.query(groupKeySt),
+                        pool
+                );
+
+                ResultSet groupKeyRs = groupKeyFuture.get();
+
+                if (!groupKeyRs.next()) {
+                    return Optional.empty();
+                }
+
+                String groupKey = groupKeyRs.getString("group_key");
+
+                PreparedStatement groupColorSt = database.getConnection().prepareStatement("SELECT color FROM group_groups WHERE group_key = ?");
+                CompletableFuture<ResultSet> groupColorFuture = CompletableFuture.supplyAsync(
+                        () -> database.query(groupColorSt),
+                        pool
+                );
+
+                ResultSet groupColorRs = groupColorFuture.get();
+
+                if (!groupColorRs.next()) {
+                    return Optional.empty();
+                }
+
+                char color = groupColorRs.getString("color").charAt(0);
+
+                return Optional.of(color);
+
+            } catch (SQLException | InterruptedException | ExecutionException e) {
+                Bukkit.getLogger().warning("[Groups] Error while checking user existing: " + e.getMessage());
+                return Optional.empty();
+            }
+        }, pool);
     }
 
     @Override
