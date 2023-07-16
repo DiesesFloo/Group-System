@@ -26,7 +26,7 @@ public abstract class AbstractCommand extends Command {
             sender.sendMessage(new Message("general.no-perm", e.getPermission()).get());
         } catch (PlayerNotFoundException e) {
             Message msg = new Message("general.player-not-found");
-            msg.setUsername(e.getInput());
+            msg.setInput(e.getInput());
             sender.sendMessage(msg.get());
         } catch (ServerException e) {
             sender.sendMessage(new Message("general.server-exception").get());
