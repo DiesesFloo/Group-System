@@ -3,6 +3,7 @@ package net.playlegend.spigot.groupsystem.commands;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.commands.cmd.CreateGroupCommand;
+import net.playlegend.spigot.groupsystem.commands.cmd.DeleteGroupCommand;
 import net.playlegend.spigot.groupsystem.commands.cmd.GetGroupCommand;
 import net.playlegend.spigot.groupsystem.commands.cmd.SetGroupCommand;
 import org.bukkit.Bukkit;
@@ -26,6 +27,7 @@ public class CommandRegistry {
         register(new CreateGroupCommand());
         register(new SetGroupCommand());
         register(new GetGroupCommand());
+        register(new DeleteGroupCommand());
     }
 
     private void register(Command command) {

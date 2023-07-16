@@ -3,7 +3,7 @@ general:
   no-perm: "&7You are &clacking &7the permission &8'&7&o%permission%&8'"
   player-not-found: "&7The player &c%input% &7wasn't &7found."
   group-not-found: "&7The group &c%input% &7wasn't &7found."
-  not-enough-arguments: "&7Wrong command usage. Please provide more arguments."
+  not-enough-arguments: "&7Wrong command usage. Use: &c%message%"
   server-exception: "&c&lInternal error: Please report this in the support."
 commands:
   creategroup:
@@ -17,3 +17,5 @@ commands:
   getgroup:
     self: "&7Your group: %user_group_color%%user_group_name% &8(&7%user_group_until%&8)"
     other: "&6%username%'s &7group: %user_group_color%%user_group_name% &8(&7%user_group_until%&8)"
+  deletegroup:
+    deleted: "&7The group &6%input% &7was deleted &asuccessfully&7."
