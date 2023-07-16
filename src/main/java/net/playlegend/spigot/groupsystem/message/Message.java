@@ -102,8 +102,8 @@ public class Message {
             message = message.replace("%input%", input);
         }
 
-        if (days != null) {
-            message = message.replace("%days%", String.valueOf(days));
+        if (days != 0) {
+            message = message.replace("%days%", days + "d");
         } else {
             message = message.replace("%days%", "PERMANENT");
         }
