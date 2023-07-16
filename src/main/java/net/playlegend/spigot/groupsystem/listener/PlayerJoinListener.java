@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class PlayerJoinListener implements Listener {
 
@@ -23,7 +24,7 @@ public class PlayerJoinListener implements Listener {
                         DatabaseRegistry.getDatabase().getService().getGroup("default").get().get(),
                         null));
             }
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }

@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 
 public class CreateGroupCommand extends AbstractCommand {
     public CreateGroupCommand() {
@@ -45,7 +46,7 @@ public class CreateGroupCommand extends AbstractCommand {
 
                 return false;
             }
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
             throw new ServerException("Type: '" + e.getCause() + "'; Message: '" + e.getMessage() + "'");
         }
 
