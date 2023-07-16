@@ -1,7 +1,8 @@
 prefix: "&8[&cGroups§8] &7"
 general:
   no-perm: "&7You are &clacking &7the permission &8'&7&o%permission%&8'"
-  player-not-found: "&7The Player &c%input% &7wasn't &7found."
+  player-not-found: "&7The player &c%input% &7wasn't &7found."
+  group-not-found: "&7The group &c%input% &7wasn't &7found."
   not-enough-arguments: "&7Wrong command usage. Please provide more arguments."
   server-exception: "&c&lInternal error: Please report this in the support."
 commands:
@@ -10,3 +11,6 @@ commands:
     exists: "&7This group already &cexists&7."
     no-color-code: "&c%input% &7isn't a color-code."
     priority-number: "&7The priority must be a &cnumber&7."
+  setgroup:
+    time-number: "&7The time must be a &cnumber&7."
+    group-set: "&7The group %group_color%%group_name% &7was set to &6%username% &8(&6%days%&8)"
