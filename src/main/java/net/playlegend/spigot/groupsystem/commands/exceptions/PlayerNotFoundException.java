@@ -16,10 +16,10 @@ public class PlayerNotFoundException extends Exception {
         this.input = "";
     }
 
-    public PlayerNotFoundException(String permission) {
+    public PlayerNotFoundException(String input) {
         super("");
 
-        this.input = permission;
+        this.input = input;
     }
 
     public PlayerNotFoundException(String input, String message) {
