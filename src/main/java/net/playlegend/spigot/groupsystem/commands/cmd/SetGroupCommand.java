@@ -52,7 +52,6 @@ public class SetGroupCommand extends AbstractCommand {
         }
 
         String groupString = args[1];
-        Bukkit.getLogger().info("Pass 1");
 
         try {
             if (!service.groupExists(groupString.toLowerCase()).get())
@@ -60,8 +59,6 @@ public class SetGroupCommand extends AbstractCommand {
         } catch (ExecutionException | InterruptedException e) {
             throw new ServerException("Type: '" + e.getCause() + "'; Message: '" + e.getMessage() + "'");
         }
-
-        Bukkit.getLogger().info("Pass 2");
 
         GroupGeneric group;
 
@@ -76,8 +73,6 @@ public class SetGroupCommand extends AbstractCommand {
         } catch (ExecutionException | InterruptedException e) {
             throw new ServerException("Type: '" + e.getCause() + "'; Message: '" + e.getMessage() + "'");
         }
-
-        Bukkit.getLogger().info("Pass 3");
 
         int days = 0;
         Timestamp timestamp = null;
@@ -108,13 +103,14 @@ public class SetGroupCommand extends AbstractCommand {
 
             service.createUser(user);
 
-            sender.sendMessage(new Message("commands.setgroup.group-set", user, playerString, days).get());
+            Message msg = new Message("commands.setgroup.group-set", user, playerString, days);
+            msg.setGroup(group);
+
+            sender.sendMessage(msg.get());
 
         } catch (ExecutionException | InterruptedException e) {
             throw new ServerException("Type: '" + e.getCause() + "'; Message: '" + e.getMessage() + "'");
         }
-        Bukkit.getLogger().info("Pass 4");
-
 
         return true;
     }
