@@ -24,15 +24,17 @@ public class Message {
     String message;
     String permission;
     String input;
+    Integer days;
 
     public Message(String key) {
         this.key = key;
     }
 
-    public Message(String key, UserGeneric user, String username) {
+    public Message(String key, UserGeneric user, String username, int days) {
         this.key = key;
         this.user = user;
         this.username = username;
+        this.days = days;
     }
 
     public Message(String key, UserGeneric user, String username, String message) {
@@ -98,6 +100,12 @@ public class Message {
 
         if (input != null) {
             message = message.replace("%input%", input);
+        }
+
+        if (days != null) {
+            message = message.replace("%days%", String.valueOf(days));
+        } else {
+            message = message.replace("%days%", "PERMANENT");
         }
 
         message = ChatColor.translateAlternateColorCodes('&', message);
