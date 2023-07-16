@@ -1,5 +1,6 @@
 package net.playlegend.spigot.groupsystem;
 
+import net.playlegend.spigot.groupsystem.commands.CommandRegistry;
 import net.playlegend.spigot.groupsystem.config.ConfigHandler;
 import net.playlegend.spigot.groupsystem.database.DatabaseRegistry;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
@@ -29,6 +30,8 @@ public final class GroupSystemPlugin extends JavaPlugin {
         service.createUsersTable();
         service.createGroupsTable();
         service.createDefaultGroup();
+
+        new CommandRegistry(this).registerAllCommands();
 
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
     }

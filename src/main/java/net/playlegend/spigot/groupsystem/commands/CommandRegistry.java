@@ -2,6 +2,7 @@ package net.playlegend.spigot.groupsystem.commands;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import net.playlegend.spigot.groupsystem.commands.cmd.CreateGroupCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -20,7 +21,7 @@ public class CommandRegistry {
     }
 
     public void registerAllCommands() {
-
+        register(new CreateGroupCommand());
     }
 
     private void register(Command command) {
@@ -29,7 +30,7 @@ public class CommandRegistry {
 
     private CommandMap getCommandMap() {
         try {
-            final Field bukkitCmdMap = Bukkit.getServer().getHelpMap().getClass().getDeclaredField("commandMap");
+            final Field bukkitCmdMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCmdMap.setAccessible(true);
 
             return (CommandMap) bukkitCmdMap.get(Bukkit.getServer());
