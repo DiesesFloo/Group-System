@@ -32,8 +32,8 @@ public abstract class AbstractCommand extends Command {
             sender.sendMessage(new Message("general.server-exception").get());
             Bukkit.getLogger().warning("[Groups] Error while performing /" + getName() + " (performed by " + sender.getName() + e.getMessage());
         } catch (GroupNotFoundException e) {
-            Message msg = new Message("general.player-not-found");
-            msg.setUsername(e.getInput());
+            Message msg = new Message("general.group-not-found");
+            msg.setInput(e.getInput());
             sender.sendMessage(msg.get());
         }
 
