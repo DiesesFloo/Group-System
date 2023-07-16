@@ -28,4 +28,4 @@ commands:
     set: "&7The prefix was set to %input%Player &asuccessfully&7."
   setcolor:
     no-color-code: "&c%input% &7isn't a color-code."
-    set: "&7The color was set to %input%▮ &asuccessfully&7."
+    set: "&7The color was set to %input%■ &asuccessfully&7."
