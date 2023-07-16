@@ -23,6 +23,7 @@ public class Message {
     String username;
     String message;
     String permission;
+    String input;
 
     public Message(String key) {
         this.key = key;
@@ -58,6 +59,14 @@ public class Message {
             return "Message is missing, please contact the PlayLegend-team (Key:" + key + ")";
         }
 
+        String prefix = configuration.getString("prefix");
+
+        if (prefix == null) {
+            return "Prefix is missing, please contact the PlayLegend-team";
+        }
+
+        message = prefix + message;
+
         if (user != null) {
 
             GroupGeneric userGroup = user.getGroup();
@@ -87,10 +96,14 @@ public class Message {
             message = message.replace("%permission%", permission);
         }
 
+        if (input != null) {
+            message = message.replace("%input%", input);
+        }
+
         message = ChatColor.translateAlternateColorCodes('&', message);
 
         if (this.message != null) {
-            message = message.replace("%message%", message);
+            message = message.replace("%message%", this.message);
         }
 
         return message;
