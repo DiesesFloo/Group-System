@@ -19,8 +19,8 @@ public class DeleteGroupCommand extends AbstractCommand {
     public boolean onExecute(CommandSender sender, String cmd, String[] args) throws NotEnoughArgumentsException, NoPermissionException, ServerException, GroupNotFoundException {
         DatabaseService service = DatabaseRegistry.getDatabase().getService();
 
-        if (!sender.hasPermission("playlegend.groups.group.create")) {
-            throw new NoPermissionException("playlegend.groups.group.create");
+        if (!sender.hasPermission("playlegend.groups.group.delete")) {
+            throw new NoPermissionException("playlegend.groups.group.delete");
         }
 
         if (args.length == 0) {

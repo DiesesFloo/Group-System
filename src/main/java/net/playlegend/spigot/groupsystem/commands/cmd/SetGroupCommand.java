@@ -26,8 +26,8 @@ public class SetGroupCommand extends AbstractCommand {
 
         DatabaseService service = DatabaseRegistry.getDatabase().getService();
 
-        if (!sender.hasPermission("playlegend.groups.group.create")) {
-            throw new NoPermissionException("playlegend.groups.group.create");
+        if (!sender.hasPermission("playlegend.groups.group.set")) {
+            throw new NoPermissionException("playlegend.groups.group.set");
         }
 
         if (args.length < 2) {
