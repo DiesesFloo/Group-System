@@ -16,11 +16,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserGeneric {
 
-    private final UUID uuid;
+    final UUID uuid;
 
-    private final GroupGeneric group;
+    GroupGeneric group;
 
-    private final Timestamp groupUntilTimeStamp;
+    Timestamp groupUntilTimeStamp;
 
     public Optional<Long> groupUntil() {
         if (groupUntilTimeStamp == null) {
