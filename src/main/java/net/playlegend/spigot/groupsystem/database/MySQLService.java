@@ -122,7 +122,7 @@ public class MySQLService extends DatabaseService {
     public CompletableFuture<Optional<UserGeneric>> getUser(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                PreparedStatement st = database.getConnection().prepareStatement("SELECT group, until FROM group_users WHERE uuid = ?");
+                PreparedStatement st = database.getConnection().prepareStatement("SELECT group_name, until FROM group_users WHERE uuid = ?");
                 st.setString(1, uuid.toString());
 
                 CompletableFuture<ResultSet> future = CompletableFuture.supplyAsync(
@@ -136,7 +136,7 @@ public class MySQLService extends DatabaseService {
                     return Optional.empty();
                 }
 
-                String groupString = rs.getString("group");
+                String groupString = rs.getString("group_name");
                 Timestamp until = rs.getTimestamp("until");
 
                 rs.close();
