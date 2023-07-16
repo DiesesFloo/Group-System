@@ -3,15 +3,24 @@ package net.playlegend.spigot.groupsystem.database;
 import com.google.gson.Gson;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
 import net.playlegend.spigot.groupsystem.groups.GroupGeneric;
 import net.playlegend.spigot.groupsystem.groups.UserGeneric;
-import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
 import net.playlegend.spigot.groupsystem.permission.Permission;
 import org.bukkit.Bukkit;
 
-import java.sql.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MySQLService extends DatabaseService {
@@ -99,6 +108,8 @@ public class MySQLService extends DatabaseService {
             try {
                 PreparedStatement groupKeySt = database.getConnection().prepareStatement("SELECT group_key FROM group_users WHERE uuid = ?");
 
+                groupKeySt.setString(1, uuid.toString());
+
                 CompletableFuture<ResultSet> groupKeyFuture = CompletableFuture.supplyAsync(
                         () -> database.query(groupKeySt),
                         pool
@@ -112,21 +123,7 @@ public class MySQLService extends DatabaseService {
 
                 String groupKey = groupKeyRs.getString("group_key");
 
-                PreparedStatement groupPrefixSt = database.getConnection().prepareStatement("SELECT prefix FROM group_groups WHERE group_key = ?");
-                CompletableFuture<ResultSet> groupPrefixFuture = CompletableFuture.supplyAsync(
-                        () -> database.query(groupPrefixSt),
-                        pool
-                );
-
-                ResultSet groupPrefixRs = groupPrefixFuture.get();
-
-                if (!groupPrefixRs.next()) {
-                    return Optional.empty();
-                }
-
-                String prefix = groupPrefixRs.getString("prefix");
-
-                return Optional.of(prefix);
+                return getPrefix(groupKey).get();
 
             } catch (SQLException | InterruptedException | ExecutionException e) {
                 Bukkit.getLogger().warning("[Groups] Error while checking user existing: " + e.getMessage());
@@ -154,24 +151,10 @@ public class MySQLService extends DatabaseService {
 
                 String groupKey = groupKeyRs.getString("group_key");
 
-                PreparedStatement groupColorSt = database.getConnection().prepareStatement("SELECT color FROM group_groups WHERE group_key = ?");
-                CompletableFuture<ResultSet> groupColorFuture = CompletableFuture.supplyAsync(
-                        () -> database.query(groupColorSt),
-                        pool
-                );
-
-                ResultSet groupColorRs = groupColorFuture.get();
-
-                if (!groupColorRs.next()) {
-                    return Optional.empty();
-                }
-
-                char color = groupColorRs.getString("color").charAt(0);
-
-                return Optional.of(color);
+                return getColor(groupKey).get();
 
             } catch (SQLException | InterruptedException | ExecutionException e) {
-                Bukkit.getLogger().warning("[Groups] Error while checking user existing: " + e.getMessage());
+                Bukkit.getLogger().warning("[Groups] Error while getting user color: " + e.getMessage());
                 return Optional.empty();
             }
         }, pool);
@@ -401,6 +384,60 @@ public class MySQLService extends DatabaseService {
         } catch (SQLException e) {
             Bukkit.getLogger().warning("[Groups] Error while setting prefix: " + e.getMessage());
         }
+    }
+
+    @Override
+    public CompletableFuture<Optional<String>> getPrefix(String key) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement groupPrefixSt = database.getConnection().prepareStatement("SELECT prefix FROM group_groups WHERE group_key = ?");
+                CompletableFuture<ResultSet> groupPrefixFuture = CompletableFuture.supplyAsync(
+                        () -> database.query(groupPrefixSt),
+                        pool
+                );
+
+                groupPrefixSt.setString(1, key);
+
+                ResultSet groupPrefixRs = groupPrefixFuture.get();
+
+                if (!groupPrefixRs.next()) {
+                    return Optional.empty();
+                }
+
+                String prefix = groupPrefixRs.getString("prefix");
+
+                return Optional.of(prefix);
+            } catch (InterruptedException | ExecutionException | SQLException e) {
+                Bukkit.getLogger().warning("[Groups] Error while getting group prefix: " + e.getMessage());
+                return Optional.empty();
+            }
+        }, pool);
+    }
+
+    @Override
+    public CompletableFuture<Optional<Character>> getColor(String key) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement groupColorSt = database.getConnection().prepareStatement("SELECT color FROM group_groups WHERE group_key = ?");
+                CompletableFuture<ResultSet> groupColorFuture = CompletableFuture.supplyAsync(
+                        () -> database.query(groupColorSt),
+                        pool
+                );
+
+                ResultSet groupColorRs = groupColorFuture.get();
+
+                if (!groupColorRs.next()) {
+                    return Optional.empty();
+                }
+
+                char color = groupColorRs.getString("color").charAt(0);
+
+                return Optional.of(color);
+            } catch (InterruptedException | ExecutionException | SQLException e) {
+                Bukkit.getLogger().warning("[Groups] Error while getting group color: " + e.getMessage());
+                return Optional.empty();
+            }
+        }, pool);
     }
 
     @Override

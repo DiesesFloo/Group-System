@@ -40,6 +40,10 @@ public abstract class DatabaseService {
 
     public abstract void setColor(String key, char color);
 
+    public abstract CompletableFuture<Optional<String>> getPrefix(String key);
+
+    public abstract CompletableFuture<Optional<Character>> getColor(String key);
+
     public abstract CompletableFuture<Boolean> groupExists(String key);
 
     public abstract CompletableFuture<Optional<GroupGeneric>> getGroup(String key);
