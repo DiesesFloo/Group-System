@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 public class PlayerJoinListener implements Listener {
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+    public void handleJoin(PlayerJoinEvent event) {
         DatabaseService service = DatabaseRegistry.getDatabase().getService();
         TablistHandler handler = GroupSystemPlugin.getInstance().getTablistHandler();
 
