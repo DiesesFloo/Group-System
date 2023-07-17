@@ -1,5 +1,8 @@
 package net.playlegend.spigot.groupsystem;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.commands.CommandRegistry;
 import net.playlegend.spigot.groupsystem.config.ConfigHandler;
 import net.playlegend.spigot.groupsystem.database.DatabaseRegistry;
@@ -9,58 +12,52 @@ import net.playlegend.spigot.groupsystem.listener.PlayerChatMessageListener;
 import net.playlegend.spigot.groupsystem.listener.PlayerJoinListener;
 import net.playlegend.spigot.groupsystem.tablist.TablistHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Getter
 public final class GroupSystemPlugin extends JavaPlugin {
 
-    private static JavaPlugin plugin;
-    private static GroupSystemPlugin instance;
-    private ConfigHandler configHandler;
-    private TablistHandler tablistHandler;
+    @Getter static JavaPlugin plugin;
+    @Getter static GroupSystemPlugin instance;
+    ConfigHandler configHandler;
+    TablistHandler tablistHandler;
 
     @Override
     public void onEnable() {
         plugin = this;
         instance = this;
-
-        configHandler = new ConfigHandler();
         tablistHandler = new TablistHandler();
 
-        configHandler.createConfigs();
-        configHandler.updateValuesOfConfig();
+        startConfigHandler();
+        startDatabase();
 
+        new CommandRegistry(this).registerAllCommands();
+
+        registerEvents();
+    }
+
+    private void startDatabase() {
         DatabaseRegistry.getDatabase().connect();
         DatabaseService service = DatabaseRegistry.getDatabase().getService();
 
         service.createUsersTable();
         service.createGroupsTable();
         service.createDefaultGroup();
-
-        new CommandRegistry(this).registerAllCommands();
-
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerChatMessageListener(), this);
-        Bukkit.getPluginManager().registerEvents(new GroupChangeListener(), this);
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
+    private void startConfigHandler() {
+        configHandler = new ConfigHandler();
+        configHandler.createConfigs();
+        configHandler.updateValuesOfConfig();
     }
 
-    public static JavaPlugin getPlugin() {
-        return plugin;
-    }
+    private void registerEvents() {
+        PluginManager pluginManager = Bukkit.getPluginManager();
 
-    public ConfigHandler getConfigHandler() {
-        return configHandler;
-    }
-
-    public TablistHandler getTablistHandler() {
-        return tablistHandler;
-    }
-
-    public static GroupSystemPlugin getInstance() {
-        return instance;
+        pluginManager.registerEvents(new PlayerJoinListener(), this);
+        pluginManager.registerEvents(new PlayerChatMessageListener(), this);
+        pluginManager.registerEvents(new GroupChangeListener(), this);
     }
 }
