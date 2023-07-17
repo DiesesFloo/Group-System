@@ -10,6 +10,7 @@ import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
 import net.playlegend.spigot.groupsystem.listener.GroupChangeListener;
 import net.playlegend.spigot.groupsystem.listener.PlayerChatMessageListener;
 import net.playlegend.spigot.groupsystem.listener.PlayerJoinListener;
+import net.playlegend.spigot.groupsystem.sign.SignChangeListener;
 import net.playlegend.spigot.groupsystem.tablist.TablistHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -59,5 +60,6 @@ public final class GroupSystemPlugin extends JavaPlugin {
         pluginManager.registerEvents(new PlayerJoinListener(), this);
         pluginManager.registerEvents(new PlayerChatMessageListener(), this);
         pluginManager.registerEvents(new GroupChangeListener(), this);
+        pluginManager.registerEvents(new SignChangeListener(), this);
     }
 }
