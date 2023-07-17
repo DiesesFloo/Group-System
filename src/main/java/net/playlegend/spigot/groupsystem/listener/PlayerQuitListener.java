@@ -2,7 +2,6 @@ package net.playlegend.spigot.groupsystem.listener;
 
 import net.playlegend.spigot.groupsystem.database.DatabaseRegistry;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
-import net.playlegend.spigot.groupsystem.groups.GroupGeneric;
 import net.playlegend.spigot.groupsystem.groups.UserGeneric;
 import net.playlegend.spigot.groupsystem.message.Message;
 import org.bukkit.entity.Player;
@@ -10,14 +9,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-public class PlayerJoinListener implements Listener {
+public class PlayerQuitListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
-    public void handleJoin(PlayerJoinEvent event) {
+    public void handleQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
         DatabaseService service = DatabaseRegistry.getDatabase().getService();
@@ -35,12 +35,12 @@ public class PlayerJoinListener implements Listener {
 
         UserGeneric user = userOptional.get();
 
-        Message msg = new Message("join-message");
+        Message msg = new Message("quit-message");
         msg.setUser(user);
         msg.setUsername(player.getName());
         msg.setUsePrefix(false);
 
-        event.setJoinMessage(msg.get());
+        event.setQuitMessage(msg.get());
     }
 
 }

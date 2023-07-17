@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 public class DeleteGroupCommand extends AbstractCommand {
     public DeleteGroupCommand() {
-        super("deletegroup", "Delete a group from the database", List.of("dgroup"));
+        super("deletegroup", "Delete a group from the database", List.of("dgroup", "delgroup"));
     }
 
     @Override

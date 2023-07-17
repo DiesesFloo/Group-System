@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
-import net.playlegend.spigot.groupsystem.event.GroupChangeEvent;
+import net.playlegend.spigot.groupsystem.groups.event.GroupChangeEvent;
 import net.playlegend.spigot.groupsystem.groups.GroupGeneric;
 import net.playlegend.spigot.groupsystem.groups.UserGeneric;
 import net.playlegend.spigot.groupsystem.permission.Permission;

@@ -1,4 +1,4 @@
-package net.playlegend.spigot.groupsystem.event;
+package net.playlegend.spigot.groupsystem.groups.event;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

@@ -1,5 +1,7 @@
 prefix: "&8[&cGroups§8] &7"
 chat-format: "%prefix%%username% &8▸ &f%message%"
+join-message: "&8[&a+&8] %user_group_color%%username%"
+quit-message: ""
 general:
   no-perm: "&7You are &clacking &7the permission &8'&7&o%permission%&8'"
   player-not-found: "&7The player &c%input% &7wasn't &7found."

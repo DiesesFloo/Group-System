@@ -1,7 +1,7 @@
-package net.playlegend.spigot.groupsystem.listener;
+package net.playlegend.spigot.groupsystem.groups;
 
 import net.playlegend.spigot.groupsystem.GroupSystemPlugin;
-import net.playlegend.spigot.groupsystem.event.GroupChangeEvent;
+import net.playlegend.spigot.groupsystem.groups.event.GroupChangeEvent;
 import net.playlegend.spigot.groupsystem.tablist.TablistHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
