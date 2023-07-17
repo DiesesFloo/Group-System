@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
+import net.playlegend.spigot.groupsystem.event.GroupChangeEvent;
 import net.playlegend.spigot.groupsystem.groups.GroupGeneric;
 import net.playlegend.spigot.groupsystem.groups.UserGeneric;
 import net.playlegend.spigot.groupsystem.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -257,6 +259,25 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
+    public CompletableFuture<Optional<GroupGeneric>> getGroup(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Optional<String> groupKeyOptional = getGroupKey(uuid).get();
+
+                if (groupKeyOptional.isEmpty()) {
+                    return Optional.empty();
+                }
+
+                return getGroup(groupKeyOptional.get()).get();
+
+            } catch (InterruptedException | ExecutionException e) {
+                Bukkit.getLogger().warning("[Groups] Error while getting user priority: " + e.getMessage());
+                return Optional.empty();
+            }
+        }, pool);
+    }
+
+    @Override
     public void setGroup(UUID uuid, String key, Timestamp until) {
         try {
             PreparedStatement st = database.getConnection().prepareStatement("UPDATE group_users SET group_key = ?, until = ? WHERE uuid = ?");
@@ -270,6 +291,12 @@ public class MySQLService extends DatabaseService {
             );
 
             future.join();
+
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                Bukkit.getPluginManager().callEvent(new GroupChangeEvent(player, key));
+            }
+
         } catch (SQLException e) {
             Bukkit.getLogger().warning("[Groups] Error while setting group: " + e.getMessage());
         }

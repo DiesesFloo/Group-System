@@ -18,12 +18,14 @@ public class Message {
     static YamlConfiguration configuration;
 
     final String key;
+    boolean usePrefix = true;
     UserGeneric user;
     GroupGeneric group;
     String username;
     String message;
     String permission;
     String input;
+    String playerPrefix;
     int days = 0;
 
     public Message(String key) {
@@ -61,13 +63,15 @@ public class Message {
             return "Message is missing, please contact the PlayLegend-team (Key:" + key + ")";
         }
 
-        String prefix = configuration.getString("prefix");
+        if (usePrefix) {
+            String prefix = configuration.getString("prefix");
 
-        if (prefix == null) {
-            return "Prefix is missing, please contact the PlayLegend-team";
+            if (prefix == null) {
+                return "Prefix is missing, please contact the PlayLegend-team";
+            }
+
+            message = prefix + message;
         }
-
-        message = prefix + message;
 
         if (user != null) {
 
@@ -100,6 +104,10 @@ public class Message {
 
         if (input != null) {
             message = message.replace("%input%", input);
+        }
+
+        if (this.playerPrefix != null) {
+            message = message.replace("%prefix%", this.playerPrefix);
         }
 
         if (days != 0) {

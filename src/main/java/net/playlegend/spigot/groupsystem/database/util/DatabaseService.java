@@ -30,6 +30,8 @@ public abstract class DatabaseService {
 
     public abstract CompletableFuture<Optional<Integer>> getPriority(UUID uuid);
 
+    public abstract CompletableFuture<Optional<GroupGeneric>> getGroup(UUID uuid);
+
     public abstract void setGroup(UUID uuid, String key, Timestamp until);
 
     public abstract void createGroup(GroupGeneric group);

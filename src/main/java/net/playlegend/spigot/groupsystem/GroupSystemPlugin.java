@@ -4,7 +4,10 @@ import net.playlegend.spigot.groupsystem.commands.CommandRegistry;
 import net.playlegend.spigot.groupsystem.config.ConfigHandler;
 import net.playlegend.spigot.groupsystem.database.DatabaseRegistry;
 import net.playlegend.spigot.groupsystem.database.util.DatabaseService;
+import net.playlegend.spigot.groupsystem.listener.GroupChangeListener;
+import net.playlegend.spigot.groupsystem.listener.PlayerChatMessageListener;
 import net.playlegend.spigot.groupsystem.listener.PlayerJoinListener;
+import net.playlegend.spigot.groupsystem.tablist.TablistHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,6 +16,7 @@ public final class GroupSystemPlugin extends JavaPlugin {
     private static JavaPlugin plugin;
     private static GroupSystemPlugin instance;
     private ConfigHandler configHandler;
+    private TablistHandler tablistHandler;
 
     @Override
     public void onEnable() {
@@ -20,6 +24,7 @@ public final class GroupSystemPlugin extends JavaPlugin {
         instance = this;
 
         configHandler = new ConfigHandler();
+        tablistHandler = new TablistHandler();
 
         configHandler.createConfigs();
         configHandler.updateValuesOfConfig();
@@ -34,6 +39,8 @@ public final class GroupSystemPlugin extends JavaPlugin {
         new CommandRegistry(this).registerAllCommands();
 
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerChatMessageListener(), this);
+        Bukkit.getPluginManager().registerEvents(new GroupChangeListener(), this);
     }
 
     @Override
@@ -47,6 +54,10 @@ public final class GroupSystemPlugin extends JavaPlugin {
 
     public ConfigHandler getConfigHandler() {
         return configHandler;
+    }
+
+    public TablistHandler getTablistHandler() {
+        return tablistHandler;
     }
 
     public static GroupSystemPlugin getInstance() {

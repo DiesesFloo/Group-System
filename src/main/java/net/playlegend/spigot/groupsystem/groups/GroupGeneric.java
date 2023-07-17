@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import net.playlegend.spigot.groupsystem.permission.Permission;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -24,5 +25,19 @@ public class GroupGeneric {
     final Set<Permission> permissions;
 
     final char color;
+
+    public String getTablistPrefix() {
+        String out = prefix;
+
+        if (out.substring(out.length()-2).matches("&([0-f]|[k-o]|r)")) {
+            out = out.substring(0, out.length()-2);
+        }
+
+        if(out.endsWith(" ")) {
+            out = StringUtils.chop(out);
+        }
+
+        return out;
+    }
 
 }
