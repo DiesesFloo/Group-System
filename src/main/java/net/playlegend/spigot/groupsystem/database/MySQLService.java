@@ -103,7 +103,7 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
-    public CompletableFuture<Optional<String>> getPrefix(UUID uuid) {
+    public CompletableFuture<Optional<String>> getGroupKey(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 PreparedStatement groupKeySt = database.getConnection().prepareStatement("SELECT group_key FROM group_users WHERE uuid = ?");
@@ -123,9 +123,28 @@ public class MySQLService extends DatabaseService {
 
                 String groupKey = groupKeyRs.getString("group_key");
 
-                return getPrefix(groupKey).get();
+                return Optional.of(groupKey);
 
             } catch (SQLException | InterruptedException | ExecutionException e) {
+                Bukkit.getLogger().warning("[Groups] Error while getting user group key: " + e.getMessage());
+                return Optional.empty();
+            }
+        });
+    }
+
+    @Override
+    public CompletableFuture<Optional<String>> getPrefix(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Optional<String> groupKeyOptional = getGroupKey(uuid).get();
+
+                if (groupKeyOptional.isEmpty()) {
+                    return Optional.empty();
+                }
+
+                return getPrefix(groupKeyOptional.get()).get();
+
+            } catch (InterruptedException | ExecutionException e) {
                 Bukkit.getLogger().warning("[Groups] Error while checking user existing: " + e.getMessage());
                 return Optional.empty();
             }
@@ -136,24 +155,15 @@ public class MySQLService extends DatabaseService {
     public CompletableFuture<Optional<Character>> getColor(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                PreparedStatement groupKeySt = database.getConnection().prepareStatement("SELECT group_key FROM group_users WHERE uuid = ?");
+                Optional<String> groupKeyOptional = getGroupKey(uuid).get();
 
-                CompletableFuture<ResultSet> groupKeyFuture = CompletableFuture.supplyAsync(
-                        () -> database.query(groupKeySt),
-                        pool
-                );
-
-                ResultSet groupKeyRs = groupKeyFuture.get();
-
-                if (!groupKeyRs.next()) {
+                if (groupKeyOptional.isEmpty()) {
                     return Optional.empty();
                 }
 
-                String groupKey = groupKeyRs.getString("group_key");
+                return getColor(groupKeyOptional.get()).get();
 
-                return getColor(groupKey).get();
-
-            } catch (SQLException | InterruptedException | ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 Bukkit.getLogger().warning("[Groups] Error while getting user color: " + e.getMessage());
                 return Optional.empty();
             }
@@ -224,6 +234,25 @@ public class MySQLService extends DatabaseService {
 
             return Optional.empty();
 
+        }, pool);
+    }
+
+    @Override
+    public CompletableFuture<Optional<Integer>> getPriority(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Optional<String> groupKeyOptional = getGroupKey(uuid).get();
+
+                if (groupKeyOptional.isEmpty()) {
+                    return Optional.empty();
+                }
+
+                return getPriority(groupKeyOptional.get()).get();
+
+            } catch (InterruptedException | ExecutionException e) {
+                Bukkit.getLogger().warning("[Groups] Error while getting user priority: " + e.getMessage());
+                return Optional.empty();
+            }
         }, pool);
     }
 
@@ -494,6 +523,34 @@ public class MySQLService extends DatabaseService {
 
             return Optional.empty();
 
+        }, pool);
+    }
+
+    @Override
+    public CompletableFuture<Optional<Integer>> getPriority(String key) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement groupPrefixSt = database.getConnection().prepareStatement("SELECT priority FROM group_groups WHERE group_key = ?");
+                CompletableFuture<ResultSet> groupPrefixFuture = CompletableFuture.supplyAsync(
+                        () -> database.query(groupPrefixSt),
+                        pool
+                );
+
+                groupPrefixSt.setString(1, key);
+
+                ResultSet groupPrefixRs = groupPrefixFuture.get();
+
+                if (!groupPrefixRs.next()) {
+                    return Optional.empty();
+                }
+
+                int priority = groupPrefixRs.getInt("priority");
+
+                return Optional.of(priority);
+            } catch (InterruptedException | ExecutionException | SQLException e) {
+                Bukkit.getLogger().warning("[Groups] Error while getting group priority: " + e.getMessage());
+                return Optional.empty();
+            }
         }, pool);
     }
 

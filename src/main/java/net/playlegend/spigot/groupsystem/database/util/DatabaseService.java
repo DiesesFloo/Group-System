@@ -18,6 +18,8 @@ public abstract class DatabaseService {
 
     public abstract void createUser(UserGeneric user);
 
+    public abstract CompletableFuture<Optional<String>> getGroupKey(UUID uuid);
+
     public abstract CompletableFuture<Optional<String>> getPrefix(UUID uuid);
 
     public abstract CompletableFuture<Optional<Character>> getColor(UUID uuid);
@@ -25,6 +27,8 @@ public abstract class DatabaseService {
     public abstract CompletableFuture<Boolean> userExists(UUID uuid);
 
     public abstract CompletableFuture<Optional<UserGeneric>> getUser(UUID uuid);
+
+    public abstract CompletableFuture<Optional<Integer>> getPriority(UUID uuid);
 
     public abstract void setGroup(UUID uuid, String key, Timestamp until);
 
@@ -47,5 +51,7 @@ public abstract class DatabaseService {
     public abstract CompletableFuture<Boolean> groupExists(String key);
 
     public abstract CompletableFuture<Optional<GroupGeneric>> getGroup(String key);
+
+    public abstract CompletableFuture<Optional<Integer>> getPriority(String key);
 
 }
