@@ -58,6 +58,10 @@ public class SetGroupCommand extends AbstractCommand {
             throw new ServerException("Type: '" + e.getCause() + "'; Message: '" + e.getMessage() + "'");
         }
 
+        if (!sender.hasPermission("playlegend.groups.group.set." + groupString)) {
+            throw new NoPermissionException("playlegend.groups.group.set." + groupString);
+        }
+
         GroupGeneric group;
 
         try {
