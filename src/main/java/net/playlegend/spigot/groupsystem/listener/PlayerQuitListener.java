@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 public class PlayerQuitListener implements Listener {
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void handleQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 

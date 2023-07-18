@@ -80,7 +80,7 @@ public class TablistHandler {
 
                 team.setPrefix(ChatColor.translateAlternateColorCodes('&', group.getTablistPrefix()));
                 team.setColor(Objects.requireNonNull(ChatColor.getByChar(group.getColor())));
-                team.addEntry(all.getName());
+                team.addEntry(player.getName());
             }
 
         }, pool);
@@ -115,7 +115,7 @@ public class TablistHandler {
 
                 team.setPrefix(ChatColor.translateAlternateColorCodes('&', group.getTablistPrefix()));
                 team.setColor(Objects.requireNonNull(ChatColor.getByChar(group.getColor())));
-                team.addEntry(all.getName());
+                team.addEntry(player.getName());
             }
         }, pool);
     }

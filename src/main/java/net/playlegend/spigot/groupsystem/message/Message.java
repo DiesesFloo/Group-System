@@ -26,17 +26,16 @@ public class Message {
     String permission;
     String input;
     String playerPrefix;
-    int days = 0;
+    String time;
 
     public Message(String key) {
         this.key = key;
     }
 
-    public Message(String key, UserGeneric user, String username, int days) {
+    public Message(String key, UserGeneric user, String username) {
         this.key = key;
         this.user = user;
         this.username = username;
-        this.days = days;
     }
 
     public Message(String key, UserGeneric user, String username, String message) {
@@ -110,8 +109,8 @@ public class Message {
             message = message.replace("%prefix%", this.playerPrefix);
         }
 
-        if (days != 0) {
-            message = message.replace("%days%", days + "d");
+        if (time != null) {
+            message = message.replace("%days%", time);
         } else {
             message = message.replace("%days%", "PERMANENT");
         }

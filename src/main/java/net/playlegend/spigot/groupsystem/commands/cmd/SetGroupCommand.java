@@ -31,7 +31,7 @@ public class SetGroupCommand extends AbstractCommand {
         }
 
         if (args.length < 2) {
-            throw new NotEnoughArgumentsException("/setgroup <player> <group> (<time>)");
+            throw new NotEnoughArgumentsException("/setgroup <player> <group> (<days> <hours> <minutes>)");
         }
 
         String playerString = args[0];
@@ -76,14 +76,12 @@ public class SetGroupCommand extends AbstractCommand {
             throw new ServerException("Type: '" + e.getCause() + "'; Message: '" + e.getMessage() + "'");
         }
 
-        int days = 0;
+        int minutes = 0;
         Timestamp timestamp = null;
 
         if (args.length >= 3) {
             try {
-                days = Integer.parseInt(args[2]);
-
-                timestamp = new Timestamp(System.currentTimeMillis() + ((long) days * 1000 * 60 * 60 * 24));
+                minutes += Integer.parseInt(args[2]) * 24 * 60;
             } catch (NumberFormatException e) {
                 sender.sendMessage(new Message("commands.setgroup.time-number").get());
 
@@ -91,12 +89,38 @@ public class SetGroupCommand extends AbstractCommand {
             }
         }
 
+        if (args.length >= 4) {
+            try {
+                minutes += Integer.parseInt(args[3]) * 60;
+            } catch (NumberFormatException e) {
+                sender.sendMessage(new Message("commands.setgroup.time-number").get());
+
+                return false;
+            }
+        }
+
+        if (args.length >= 5) {
+            try {
+                minutes += Integer.parseInt(args[4]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage(new Message("commands.setgroup.time-number").get());
+
+                return false;
+            }
+        }
+
+        timestamp = new Timestamp(System.currentTimeMillis() + ((long) minutes *60*1000));
 
         service.setGroup(uuid, groupString, timestamp);
 
         Message msg = new Message("commands.setgroup.group-set", group);
         msg.setUsername(playerString);
-        msg.setDays(days);
+
+        int stringDays = minutes/60/24;
+        int stringHours = (minutes-stringDays*60*24)/60;
+        int stringMinutes = minutes-stringDays*60*24-stringHours*60;
+
+        msg.setTime(minutes > 0 ? stringDays + "d, " + stringHours + "h, " + stringMinutes + "m" : null);
 
         sender.sendMessage(msg.get());
 

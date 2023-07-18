@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class TablistPlayerJoinListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void handleJoin(PlayerJoinEvent event) {
         TablistHandler handler = GroupSystemPlugin.getInstance().getTablistHandler();
         Player player = event.getPlayer();

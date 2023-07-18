@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 public class PlayerJoinListener implements Listener {
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void handleJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
