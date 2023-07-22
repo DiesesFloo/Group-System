@@ -29,6 +29,7 @@ public class CommandRegistry {
         register(new SetPrefixCommand());
         register(new SetPriorityCommand());
         register(new SetColorCommand());
+        register(new ReloadGroupMessagesCommand());
     }
 
     private void register(Command command) {

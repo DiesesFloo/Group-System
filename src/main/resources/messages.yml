@@ -32,6 +32,8 @@ commands:
   setcolor:
     no-color-code: "&c%input% &7isn't a color-code."
     set: "&7The color was set to %input%■ &asuccessfully&7."
+  reloadgroupmessages:
+    reloaded: "&7The messages were reloaded successfully."
 sign:
   line1: "&6%username%"
   line2: "%user_group_color%%user_group_name%"
