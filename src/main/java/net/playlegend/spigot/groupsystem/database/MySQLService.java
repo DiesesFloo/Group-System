@@ -197,6 +197,20 @@ public class MySQLService extends DatabaseService {
     }
 
     @Override
+    public void deleteUser(UUID uuid) {
+        try {
+            PreparedStatement st = database.getConnection().prepareStatement("DELETE FROM group_users WHERE uuid = ?");
+            st.setString(1, uuid.toString());
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> database.update(st), pool);
+            future.join();
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("[Groups] Error while deleting user: " + e.getMessage());
+        }
+
+    }
+
+    @Override
     public CompletableFuture<Optional<UserGeneric>> getUser(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {

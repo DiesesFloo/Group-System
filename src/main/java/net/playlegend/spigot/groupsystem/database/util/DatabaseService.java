@@ -26,6 +26,8 @@ public abstract class DatabaseService {
 
     public abstract CompletableFuture<Boolean> userExists(UUID uuid);
 
+    public abstract void deleteUser(UUID uuid);
+
     public abstract CompletableFuture<Optional<UserGeneric>> getUser(UUID uuid);
 
     public abstract CompletableFuture<Optional<Integer>> getPriority(UUID uuid);
