@@ -34,7 +34,7 @@ public abstract class CommandTest {
     public void sendsNoPermMessage() {
         PlayerMock player = server.addPlayer();
 
-        Assertions.assertThrows(NoPermissionException.class, () -> command.execute(player, "creategroup", new String[]{}));
+        Assertions.assertThrows(NoPermissionException.class, () -> command.execute(player, command.getLabel(), new String[]{}));
     }
 
     @Test
@@ -42,7 +42,7 @@ public abstract class CommandTest {
         PlayerMock player = server.addPlayer();
         player.setOp(true);
 
-        Assertions.assertThrows(NotEnoughArgumentsException.class, () -> command.execute(player, "creategroup", new String[]{}));
+        Assertions.assertThrows(NotEnoughArgumentsException.class, () -> command.execute(player, command.getLabel(), new String[]{}));
     }
 
 }
