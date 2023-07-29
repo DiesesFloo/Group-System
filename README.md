@@ -2,6 +2,8 @@
 ### What is this project? 
 This is my trial plugin for the PlayLegend-network. This is a group and permission system equal to LuckPerms. 
 
+*Edit: Unfortunately I was rejected, but let's see what the future will bring*
+
 ### Commands
 | **Aliases**                                          | **Usage**                                               | **Description**                                                                                                                | **Permissions**                                                    |
 |------------------------------------------------------|---------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
